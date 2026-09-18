@@ -1,7 +1,7 @@
 """Application-wide constants and paths."""
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 DB_PATH = BASE_DIR / "hotelpos.db"
 
 APP_NAME = "Hotel POS"

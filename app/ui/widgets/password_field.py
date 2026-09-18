@@ -5,8 +5,8 @@ import qtawesome as qta
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QLineEdit, QToolButton
 
-from app.theme import theme_manager
-from app.widgets.glow_input import GlowLineEdit
+from app.ui.theme import theme_manager
+from app.ui.widgets.glow_input import GlowLineEdit
 
 
 class PasswordField(GlowLineEdit):

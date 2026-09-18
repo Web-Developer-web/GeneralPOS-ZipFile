@@ -6,8 +6,8 @@ from PySide6.QtWidgets import (
     QFrame,
 )
 
-from app.widgets.message_box import AppMessageBox
-from app.widgets.nav_button import NavButton
+from app.ui.widgets.message_box import AppMessageBox
+from app.ui.widgets.nav_button import NavButton
 
 NAV_ITEMS = [
     # (key, label, icon, accent) - each section gets its own signature glow
@@ -45,7 +45,7 @@ class Sidebar(QWidget):
 
         brand_row = QHBoxLayout()
         self.brand_icon = QLabel()
-        from app.branding import build_app_icon
+        from app.ui.branding import build_app_icon
         self.brand_icon.setPixmap(build_app_icon().pixmap(28, 28))
         brand_row.addWidget(self.brand_icon)
         self.brand_label = QLabel(hotel_name)

@@ -14,7 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app.licensing import generate_lifetime_key, format_id, _normalize_key  # noqa: E402
+from app.core.licensing import generate_lifetime_key, format_id, _normalize_key  # noqa: E402
 
 
 def main():

@@ -7,13 +7,13 @@ from PySide6.QtWidgets import (
     QTableWidget, QTableWidgetItem, QHeaderView,
 )
 
-from app.database import Database
-from app.widgets.stat_card import StatCard
-from app.widgets.credit_label import AnimatedCreditLabel
-from app.widgets.digital_clock import DigitalClockWidget
-from app.widgets.wavy_background import WavyGradientBackground
-from app.widgets.animations import fade_slide_in
-from app.theme import apply_card_shadow, SUCCESS
+from app.core.database import Database
+from app.ui.widgets.stat_card import StatCard
+from app.ui.widgets.credit_label import AnimatedCreditLabel
+from app.ui.widgets.digital_clock import DigitalClockWidget
+from app.ui.widgets.wavy_background import WavyGradientBackground
+from app.ui.widgets.animations import fade_slide_in
+from app.ui.theme import apply_card_shadow, SUCCESS
 
 
 class DashboardPage(QWidget):

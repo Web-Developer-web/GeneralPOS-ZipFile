@@ -2,17 +2,17 @@
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QStackedWidget
 
-from app import config
-from app.database import Database
-from app.theme import theme_manager
-from app.widgets.sidebar import Sidebar
-from app.widgets.animations import crossfade_stack
-from app.pages.dashboard_page import DashboardPage
-from app.pages.items_page import ItemsPage
-from app.pages.billing_page import BillingPage
-from app.pages.reports_page import ReportsPage
-from app.pages.backup_page import BackupPage
-from app.pages.settings_page import SettingsPage
+from app.core import config
+from app.core.database import Database
+from app.ui.theme import theme_manager
+from app.ui.widgets.sidebar import Sidebar
+from app.ui.widgets.animations import crossfade_stack
+from app.ui.pages.dashboard_page import DashboardPage
+from app.ui.pages.items_page import ItemsPage
+from app.ui.pages.billing_page import BillingPage
+from app.ui.pages.reports_page import ReportsPage
+from app.ui.pages.backup_page import BackupPage
+from app.ui.pages.settings_page import SettingsPage
 
 
 class MainWindow(QMainWindow):

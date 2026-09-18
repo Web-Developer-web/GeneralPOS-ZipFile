@@ -5,7 +5,7 @@ import qtawesome as qta
 from PySide6.QtCore import Qt, QVariantAnimation, QEasingCurve
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QLabel
 
-from app.theme import theme_manager
+from app.ui.theme import theme_manager
 
 _NUMBER_RE = re.compile(r"[-+]?\d[\d,]*\.?\d*")
 

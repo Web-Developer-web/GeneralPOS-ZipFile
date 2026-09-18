@@ -12,7 +12,7 @@ from datetime import datetime, date
 from pathlib import Path
 from typing import List, Tuple
 
-from app import config
+from app.core import config
 
 BACKUP_DIR = config.BASE_DIR / "backups"
 _PREFIX = config.DB_PATH.stem

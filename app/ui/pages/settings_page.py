@@ -7,14 +7,14 @@ from PySide6.QtWidgets import (
     QTableWidgetItem, QHeaderView, QAbstractItemView, QFormLayout, QDialog,
 )
 
-from app import config, licensing
-from app.database import Database
-from app.security import is_valid_email, is_valid_phone
-from app.widgets.password_field import PasswordField
-from app.widgets.glow_input import GlowLineEdit
-from app.widgets.message_box import AppMessageBox
-from app.pdf_utils import print_receipt, list_available_printers
-from app.theme import apply_card_shadow
+from app.core import config, licensing
+from app.core.database import Database
+from app.core.security import is_valid_email, is_valid_phone
+from app.ui.widgets.password_field import PasswordField
+from app.ui.widgets.glow_input import GlowLineEdit
+from app.ui.widgets.message_box import AppMessageBox
+from app.core.pdf_utils import print_receipt, list_available_printers
+from app.ui.theme import apply_card_shadow
 
 
 class AddUserDialog(QDialog):
@@ -433,7 +433,7 @@ class SecurityTab(QWidget):
         layout.addStretch()
 
     def change_password(self):
-        from app.security import verify_password
+        from app.core.security import verify_password
 
         current = self.current_password.text()
         new = self.new_password.text()

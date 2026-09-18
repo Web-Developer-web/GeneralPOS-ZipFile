@@ -2,14 +2,14 @@ import sys
 
 from PySide6.QtWidgets import QApplication, QStyleFactory
 
-from app import config, licensing
-from app.backup import ensure_daily_backup
-from app.branding import build_app_icon
-from app.database import Database
-from app.theme import theme_manager, build_stylesheet, build_qpalette
-from app.windows.auth_window import AuthWindow
-from app.windows.license_window import LicenseLockedWindow
-from app.windows.main_window import MainWindow
+from app.core import config, licensing
+from app.core.backup import ensure_daily_backup
+from app.core.database import Database
+from app.ui.branding import build_app_icon
+from app.ui.theme import theme_manager, build_stylesheet, build_qpalette
+from app.ui.windows.auth_window import AuthWindow
+from app.ui.windows.license_window import LicenseLockedWindow
+from app.ui.windows.main_window import MainWindow
 
 if sys.platform == "win32":
     # Without an explicit AppUserModelID, Windows associates the running

@@ -26,13 +26,13 @@ from PySide6.QtWidgets import (
     QFileDialog, QDialog, QScrollArea, QComboBox,
 )
 
-from app.database import Database
-from app.pdf_utils import (
+from app.core.database import Database
+from app.core.pdf_utils import (
     export_receipt_to_pdf, print_receipt as print_receipt_thermal,
     render_html_to_pixmap, _new_document,
 )
-from app.widgets.message_box import AppMessageBox
-from app.theme import apply_card_shadow
+from app.ui.widgets.message_box import AppMessageBox
+from app.ui.theme import apply_card_shadow
 
 CENT = Decimal("1")  # bills are recorded to whole currency units, matching
                       # the item price field (QDoubleSpinBox, 0 decimals)

@@ -7,9 +7,9 @@ from PySide6.QtWidgets import (
     QDoubleSpinBox, QComboBox, QFrame, QAbstractItemView,
 )
 
-from app.database import Database
-from app.widgets.message_box import AppMessageBox
-from app.theme import apply_card_shadow
+from app.core.database import Database
+from app.ui.widgets.message_box import AppMessageBox
+from app.ui.theme import apply_card_shadow
 
 
 class ItemDialog(QDialog):

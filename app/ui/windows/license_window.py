@@ -6,12 +6,12 @@ import qtawesome as qta
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton
 
-from app import config, licensing
-from app.database import Database
-from app.widgets.glow_input import GlowLineEdit
-from app.widgets.message_box import AppMessageBox
-from app.widgets.wavy_background import WavyGradientBackground
-from app.widgets.credit_label import AnimatedCreditLabel
+from app.core import config, licensing
+from app.core.database import Database
+from app.ui.widgets.glow_input import GlowLineEdit
+from app.ui.widgets.message_box import AppMessageBox
+from app.ui.widgets.wavy_background import WavyGradientBackground
+from app.ui.widgets.credit_label import AnimatedCreditLabel
 
 
 class LicenseLockedWindow(QWidget):

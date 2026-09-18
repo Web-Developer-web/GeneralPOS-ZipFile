@@ -5,7 +5,7 @@ from PySide6.QtCore import (
 from PySide6.QtGui import QPainter, QLinearGradient, QBrush, QColor
 from PySide6.QtWidgets import QPushButton, QGraphicsDropShadowEffect
 
-from app.theme import ACCENT
+from app.ui.theme import ACCENT
 
 
 class NavButton(QPushButton):

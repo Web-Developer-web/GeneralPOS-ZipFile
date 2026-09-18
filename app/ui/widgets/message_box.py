@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame, QWidget,
 )
 
-from app.theme import ACCENT, DANGER, SUCCESS, WARNING, PURPLE, apply_card_shadow, theme_manager
+from app.ui.theme import ACCENT, DANGER, SUCCESS, WARNING, PURPLE, apply_card_shadow, theme_manager
 
 
 class AppMessageBox(QDialog):

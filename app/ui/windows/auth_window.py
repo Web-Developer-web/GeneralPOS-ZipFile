@@ -6,18 +6,18 @@ from PySide6.QtWidgets import (
     QFrame, QStackedWidget, QCheckBox, QSizePolicy, QSpacerItem, QComboBox,
 )
 
-from app import config, licensing
-from app.database import Database
-from app.security import is_valid_email, is_valid_phone
-from app.widgets.password_field import PasswordField
-from app.widgets.glow_input import GlowLineEdit
-from app.widgets.password_strength import PasswordStrengthMeter
-from app.widgets.loading_button import set_button_loading
-from app.widgets.message_box import AppMessageBox
-from app.widgets.credit_label import AnimatedCreditLabel
-from app.widgets.wavy_background import WavyGradientBackground
-from app.widgets.animations import crossfade_stack, fade_slide_in
-from app.widgets.remember_me import save_credentials, load_credentials, clear_credentials
+from app.core import config, licensing
+from app.core.database import Database
+from app.core.security import is_valid_email, is_valid_phone
+from app.ui.widgets.password_field import PasswordField
+from app.ui.widgets.glow_input import GlowLineEdit
+from app.ui.widgets.password_strength import PasswordStrengthMeter
+from app.ui.widgets.loading_button import set_button_loading
+from app.ui.widgets.message_box import AppMessageBox
+from app.ui.widgets.credit_label import AnimatedCreditLabel
+from app.ui.widgets.wavy_background import WavyGradientBackground
+from app.ui.widgets.animations import crossfade_stack, fade_slide_in
+from app.ui.widgets.remember_me import save_credentials, load_credentials, clear_credentials
 
 
 class BrandPanel(WavyGradientBackground):
@@ -28,7 +28,7 @@ class BrandPanel(WavyGradientBackground):
         self.setFixedWidth(380)
         self._entered = False
 
-        from app.theme import apply_card_shadow
+        from app.ui.theme import apply_card_shadow
         # A soft, diffuse shadow along the panel's right edge is what gives
         # it that "floating above the page" neumorphic separation from the
         # sign-in form next to it, instead of the two panels just abutting.
@@ -43,7 +43,7 @@ class BrandPanel(WavyGradientBackground):
         layout.setSpacing(18)
         layout.addStretch(1)
 
-        from app.branding import build_app_icon
+        from app.ui.branding import build_app_icon
         self.icon_label = QLabel()
         self.icon_label.setPixmap(build_app_icon().pixmap(64, 64))
         layout.addWidget(self.icon_label)
@@ -250,7 +250,7 @@ class LoginPage(QWidget):
         set_button_loading(self.login_btn, False)
 
         user = self.db.get_user_by_username(username)
-        from app.security import verify_password
+        from app.core.security import verify_password
 
         if not user or not verify_password(password, user["password_hash"], user["password_salt"]):
             self.username_input.set_error(True)

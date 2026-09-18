@@ -12,10 +12,10 @@ from PySide6.QtWidgets import (
     QAbstractItemView, QFileDialog, QDialog, QLineEdit, QFormLayout, QSpinBox,
 )
 
-from app.database import Database
-from app.pdf_utils import export_html_to_pdf, render_report_on_printer
-from app.widgets.message_box import AppMessageBox
-from app.theme import apply_card_shadow
+from app.core.database import Database
+from app.core.pdf_utils import export_html_to_pdf, render_report_on_printer
+from app.ui.widgets.message_box import AppMessageBox
+from app.ui.theme import apply_card_shadow
 
 
 class EditBillCustomerDialog(QDialog):

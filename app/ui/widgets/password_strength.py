@@ -6,7 +6,7 @@ import re
 from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame
 
-from app.theme import DANGER, WARNING, SUCCESS, ACCENT
+from app.ui.theme import DANGER, WARNING, SUCCESS, ACCENT
 
 _LEVELS = [
     (0, "", "transparent"),

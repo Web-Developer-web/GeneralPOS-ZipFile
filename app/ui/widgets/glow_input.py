@@ -8,7 +8,7 @@ from PySide6.QtCore import QPoint, QPropertyAnimation, QEasingCurve
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QLineEdit, QGraphicsDropShadowEffect
 
-from app.theme import ACCENT, theme_manager
+from app.ui.theme import ACCENT, theme_manager
 
 _GLOW_FOCUS_BLUR = 22
 _GLOW_COLOR_ALPHA = 130

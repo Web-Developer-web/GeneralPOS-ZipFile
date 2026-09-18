@@ -5,8 +5,8 @@ import sqlite3
 from datetime import datetime, date
 from typing import Optional
 
-from app import config
-from app.security import hash_password
+from app.core import config
+from app.core.security import hash_password
 
 
 class Database:
@@ -132,7 +132,7 @@ class Database:
             # This DB already had users the moment the license table was
             # first added - it predates licensing entirely, so grandfather
             # it into Lifetime rather than locking out a live install.
-            from app import licensing
+            from app.core import licensing
             licensing.grandfather_existing_install(self)
 
     def _table_exists(self, name: str) -> bool:
