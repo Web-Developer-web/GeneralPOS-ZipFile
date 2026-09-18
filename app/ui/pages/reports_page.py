@@ -72,6 +72,10 @@ def _customer_display(bill) -> str:
     return "Walk-in"
 
 
+def _payment_display(bill) -> str:
+    return bill["payment_method"] if "payment_method" in bill.keys() and bill["payment_method"] else "Cash"
+
+
 def _make_bill_actions_widget(edit_callback, delete_callback) -> QWidget:
     """Edit/Delete icon-button pair used on every bill row in both report
     tabs - matches the Edit/Delete action style already used on the Items
@@ -200,13 +204,13 @@ class DailyReportTab(QWidget):
         card_layout = QVBoxLayout(card)
         card_layout.setContentsMargins(14, 14, 14, 14)
 
-        self.table = QTableWidget(0, 6)
+        self.table = QTableWidget(0, 7)
         self.table.setHorizontalHeaderLabels(
-            ["S.No", "Time", "Customer / Walk-in", "Items", "Grand Total", "Actions"]
+            ["S.No", "Time", "Customer / Walk-in", "Items", "Payment Method", "Grand Total", "Actions"]
         )
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(6, QHeaderView.ResizeMode.ResizeToContents)
         self.table.verticalHeader().setVisible(False)
         self.table.verticalHeader().setDefaultSectionSize(48)
         self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -235,7 +239,7 @@ class DailyReportTab(QWidget):
             time_str = bill["created_at"].split("T")[1] if "T" in bill["created_at"] else ""
             values = [
                 str(row_idx + 1), time_str, _customer_display(bill),
-                str(bill["items_count"]), f"{currency} {bill['grand_total']:.0f}",
+                str(bill["items_count"]), _payment_display(bill), f"{currency} {bill['grand_total']:.0f}",
             ]
             for col, val in enumerate(values):
                 item = QTableWidgetItem(val)
@@ -246,7 +250,7 @@ class DailyReportTab(QWidget):
                 lambda _c=False, bid=bill["id"]: self.edit_bill(bid),
                 lambda _c=False, bid=bill["id"]: self.delete_bill(bid),
             )
-            self.table.setCellWidget(row_idx, 5, actions)
+            self.table.setCellWidget(row_idx, 6, actions)
 
             total += bill["grand_total"]
         self.summary_label.setText(f"{len(bills)} bills  •  Total: {currency} {total:.0f}")
@@ -343,13 +347,13 @@ class MonthlyReportTab(QWidget):
         card_layout = QVBoxLayout(card)
         card_layout.setContentsMargins(14, 14, 14, 14)
 
-        self.table = QTableWidget(0, 6)
+        self.table = QTableWidget(0, 7)
         self.table.setHorizontalHeaderLabels(
-            ["S.No", "Date & Time", "Customer / Walk-in", "Items", "Grand Total", "Actions"]
+            ["S.No", "Date & Time", "Customer / Walk-in", "Items", "Payment Method", "Grand Total", "Actions"]
         )
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(6, QHeaderView.ResizeMode.ResizeToContents)
         self.table.verticalHeader().setVisible(False)
         self.table.verticalHeader().setDefaultSectionSize(48)
         self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -379,7 +383,7 @@ class MonthlyReportTab(QWidget):
             self.table.insertRow(row_idx)
             values = [
                 str(row_idx + 1), bill["created_at"].replace("T", " "), _customer_display(bill),
-                str(bill["items_count"]), f"{currency} {bill['grand_total']:.0f}",
+                str(bill["items_count"]), _payment_display(bill), f"{currency} {bill['grand_total']:.0f}",
             ]
             for col, val in enumerate(values):
                 item = QTableWidgetItem(val)
@@ -390,7 +394,7 @@ class MonthlyReportTab(QWidget):
                 lambda _c=False, bid=bill["id"]: self.edit_bill(bid),
                 lambda _c=False, bid=bill["id"]: self.delete_bill(bid),
             )
-            self.table.setCellWidget(row_idx, 5, actions)
+            self.table.setCellWidget(row_idx, 6, actions)
 
             total += bill["grand_total"]
         self.summary_label.setText(f"{len(bills)} bills  •  Total: {currency} {total:.0f}")
@@ -489,13 +493,13 @@ class YearlyReportTab(QWidget):
         card_layout = QVBoxLayout(card)
         card_layout.setContentsMargins(14, 14, 14, 14)
 
-        self.table = QTableWidget(0, 6)
+        self.table = QTableWidget(0, 7)
         self.table.setHorizontalHeaderLabels(
-            ["S.No", "Date & Time", "Customer / Walk-in", "Items", "Grand Total", "Actions"]
+            ["S.No", "Date & Time", "Customer / Walk-in", "Items", "Payment Method", "Grand Total", "Actions"]
         )
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(6, QHeaderView.ResizeMode.ResizeToContents)
         self.table.verticalHeader().setVisible(False)
         self.table.verticalHeader().setDefaultSectionSize(48)
         self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -523,7 +527,7 @@ class YearlyReportTab(QWidget):
             self.table.insertRow(row_idx)
             values = [
                 str(row_idx + 1), bill["created_at"].replace("T", " "), _customer_display(bill),
-                str(bill["items_count"]), f"{currency} {bill['grand_total']:.0f}",
+                str(bill["items_count"]), _payment_display(bill), f"{currency} {bill['grand_total']:.0f}",
             ]
             for col, val in enumerate(values):
                 item = QTableWidgetItem(val)
@@ -534,7 +538,7 @@ class YearlyReportTab(QWidget):
                 lambda _c=False, bid=bill["id"]: self.edit_bill(bid),
                 lambda _c=False, bid=bill["id"]: self.delete_bill(bid),
             )
-            self.table.setCellWidget(row_idx, 5, actions)
+            self.table.setCellWidget(row_idx, 6, actions)
 
             total += bill["grand_total"]
         self.summary_label.setText(f"{len(bills)} bills  •  Total: {currency} {total:.0f}")
@@ -638,13 +642,13 @@ class OverallReportTab(QWidget):
         card_layout = QVBoxLayout(card)
         card_layout.setContentsMargins(14, 14, 14, 14)
 
-        self.table = QTableWidget(0, 6)
+        self.table = QTableWidget(0, 7)
         self.table.setHorizontalHeaderLabels(
-            ["S.No", "Date & Time", "Customer / Walk-in", "Items", "Grand Total", "Actions"]
+            ["S.No", "Date & Time", "Customer / Walk-in", "Items", "Payment Method", "Grand Total", "Actions"]
         )
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-        header.setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(6, QHeaderView.ResizeMode.ResizeToContents)
         self.table.verticalHeader().setVisible(False)
         self.table.verticalHeader().setDefaultSectionSize(48)
         self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -673,7 +677,7 @@ class OverallReportTab(QWidget):
             self.table.insertRow(row_idx)
             values = [
                 str(row_idx + 1), bill["created_at"].replace("T", " "), _customer_display(bill),
-                str(bill["items_count"]), f"{currency} {bill['grand_total']:.0f}",
+                str(bill["items_count"]), _payment_display(bill), f"{currency} {bill['grand_total']:.0f}",
             ]
             for col, val in enumerate(values):
                 item = QTableWidgetItem(val)
@@ -684,7 +688,7 @@ class OverallReportTab(QWidget):
                 lambda _c=False, bid=bill["id"]: self.edit_bill(bid),
                 lambda _c=False, bid=bill["id"]: self.delete_bill(bid),
             )
-            self.table.setCellWidget(row_idx, 5, actions)
+            self.table.setCellWidget(row_idx, 6, actions)
 
             total += bill["grand_total"]
         self.summary_label.setText(f"{len(bills)} bills  •  Total: {currency} {total:.0f}")
@@ -758,6 +762,7 @@ def build_report_html(settings, title: str, bills, item_sales) -> str:
             f"<td style='{cell}'>{bill['created_at'].replace('T', ' ')}</td>"
             f"<td style='{cell}'>{_customer_display(bill)}</td>"
             f"<td style='{cell} text-align:center;'>{bill['items_count']}</td>"
+            f"<td style='{cell} text-align:center;'>{_payment_display(bill)}</td>"
             f"<td style='{cell} text-align:right;'>{currency} {bill['grand_total']:.0f}</td>"
             f"</tr>"
         )
@@ -815,10 +820,11 @@ def build_report_html(settings, title: str, bills, item_sales) -> str:
         <table width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse; font-size:10pt;">
             <tr style="background:#dfe7f2;">
                 <th width="6%" style="{cell} font-size:10pt;">S.No</th>
-                <th width="24%" style="{cell} font-size:10pt; text-align:left;">Date &amp; Time</th>
-                <th width="30%" style="{cell} font-size:10pt; text-align:left;">Customer / Walk-in</th>
-                <th width="14%" style="{cell} font-size:10pt;">Items</th>
-                <th width="26%" style="{cell} font-size:10pt; text-align:right;">Grand Total</th>
+                <th width="20%" style="{cell} font-size:10pt; text-align:left;">Date &amp; Time</th>
+                <th width="24%" style="{cell} font-size:10pt; text-align:left;">Customer / Walk-in</th>
+                <th width="10%" style="{cell} font-size:10pt;">Items</th>
+                <th width="16%" style="{cell} font-size:10pt;">Payment</th>
+                <th width="24%" style="{cell} font-size:10pt; text-align:right;">Grand Total</th>
             </tr>
             {rows_html}
         </table>

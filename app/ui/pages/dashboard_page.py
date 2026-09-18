@@ -63,7 +63,7 @@ class DashboardPage(QWidget):
         greeting = QLabel(f"Welcome back, {first_name}")
         greeting.setStyleSheet("color: white; font-size: 21px; font-weight: 700; border: none;")
         greeting_col.addWidget(greeting)
-        sub = QLabel("Here's today's snapshot of your hotel's performance.")
+        sub = QLabel("Here is a summary of your hotel's sales and activity for today.")
         sub.setStyleSheet("color: #dbeafe; font-size: 12px; border: none;")
         greeting_col.addWidget(sub)
         hero_layout.addLayout(greeting_col)
