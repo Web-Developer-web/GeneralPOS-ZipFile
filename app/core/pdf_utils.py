@@ -95,22 +95,38 @@ def _estimate_content_height_mm(html: str, width_mm: float) -> float:
     return probe.size().height() / POINTS_PER_MM
 
 
-def _make_thermal_printer(width_mm: float, height_mm: float, printer_info: QPrinterInfo = None) -> QPrinter:
-    printer = (
+def _make_thermal_printer(printer_info: QPrinterInfo = None) -> QPrinter:
+    return (
         QPrinter(printer_info, QPrinter.PrinterMode.HighResolution)
         if printer_info is not None
         else QPrinter(QPrinter.PrinterMode.HighResolution)
     )
+
+
+def _configure_thermal_page(printer: QPrinter, width_mm: float, height_mm: float):
+    """Sets the custom thermal page size/margins - must run AFTER
+    printer.setOutputFormat() (e.g. PdfFormat), not before: switching
+    output format swaps QPrinter's underlying print engine, which silently
+    resets page geometry set on the previous engine, so a margin/fullPage
+    call made before that switch would otherwise just vanish."""
     # A generous safety buffer against font-metric rounding between the
     # estimate pass and the final print pass - a slightly tall receipt with
     # trailing white space beats one that clips content onto another page.
     page_height = max(height_mm * 1.5 + 25, 40)
     printer.setPageSize(QPageSize(QSizeF(width_mm, page_height), QPageSize.Unit.Millimeter))
+    # setFullPage(True) makes Qt measure the page from the true physical
+    # paper edge instead of whatever default printable-area inset the
+    # printer driver itself bakes in - without it, a 0mm top margin here
+    # can still leave a visible gap because the driver's own margin wins.
+    # Paired with a literal 0 top margin, this is what makes the receipt
+    # start printing right at the top of the page on both a real thermal
+    # printer and a normal page printer that substitutes its own paper
+    # size for our custom one.
+    printer.setFullPage(True)
     printer.setPageMargins(
-        QMarginsF(THERMAL_MARGIN_MM, THERMAL_MARGIN_MM, THERMAL_MARGIN_MM, THERMAL_MARGIN_MM),
+        QMarginsF(THERMAL_MARGIN_MM, 0, THERMAL_MARGIN_MM, THERMAL_MARGIN_MM),
         QPageLayout.Unit.Millimeter,
     )
-    return printer
 
 
 def _print_thermal_document(html: str, printer: QPrinter, width_mm: float):
@@ -122,9 +138,10 @@ def _print_thermal_document(html: str, printer: QPrinter, width_mm: float):
 def export_receipt_to_pdf(html: str, file_path: str, width_mm: float = 80):
     """Save a receipt as a narrow, thermal-style PDF sized to fit its content."""
     height_mm = _estimate_content_height_mm(html, width_mm)
-    printer = _make_thermal_printer(width_mm, height_mm)
+    printer = _make_thermal_printer()
     printer.setOutputFormat(QPrinter.OutputFormat.PdfFormat)
     printer.setOutputFileName(file_path)
+    _configure_thermal_page(printer, width_mm, height_mm)
     _print_thermal_document(html, printer, width_mm)
 
 
@@ -146,7 +163,8 @@ def print_receipt(html: str, width_mm: float = 80, printer_name: str = "") -> bo
             return False
 
     height_mm = _estimate_content_height_mm(html, width_mm)
-    printer = _make_thermal_printer(width_mm, height_mm, printer_info)
+    printer = _make_thermal_printer(printer_info)
+    _configure_thermal_page(printer, width_mm, height_mm)
     _print_thermal_document(html, printer, width_mm)
     return True
 

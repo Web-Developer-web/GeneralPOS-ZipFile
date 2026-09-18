@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (
 from app.core.database import Database
 from app.core.pdf_utils import (
     export_receipt_to_pdf, print_receipt as print_receipt_thermal,
-    render_html_to_pixmap, _new_document,
+    render_html_to_pixmap, _new_document, _printable_width_points,
 )
 from app.ui.widgets.message_box import AppMessageBox
 from app.ui.theme import apply_card_shadow
@@ -129,17 +129,22 @@ class ReceiptDialog(QDialog):
         from PySide6.QtGui import QPageLayout
         from PySide6.QtPrintSupport import QPrintDialog, QPrinter
         printer = QPrinter(QPrinter.PrinterMode.HighResolution)
-        # A regular page printer defaults to a 0mm top margin on some
-        # drivers, which crams the receipt right up against the top edge
-        # even with "fit to page" selected - give it a sane, even margin on
-        # every side up front so the print dialog (and the print itself)
-        # start from a page that already looks right.
-        printer.setPageMargins(QMarginsF(10, 10, 10, 10), QPageLayout.Unit.Millimeter)
+        # setFullPage(True) makes Qt measure from the true physical paper
+        # edge instead of whatever default printable-area inset the
+        # printer driver itself bakes in - paired with a literal 0 top
+        # margin, this is what makes the receipt start printing right at
+        # the top of the page on a normal printer too.
+        printer.setFullPage(True)
+        printer.setPageMargins(QMarginsF(6, 0, 6, 6), QPageLayout.Unit.Millimeter)
         dialog = QPrintDialog(printer, self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             document = _new_document(self.html)
-            page_rect = printer.pageRect(QPrinter.Unit.Point)
-            document.setTextWidth(page_rect.width())
+            # Keep the receipt's own narrow thermal width here too, rather
+            # than stretching it across the full page - so choosing a
+            # normal A4/Letter printer through this dialog still prints a
+            # proper narrow thermal-style receipt instead of one blown up
+            # across the whole sheet.
+            document.setTextWidth(_printable_width_points(self.width_mm))
             document.print_(printer)
 
 
