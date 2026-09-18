@@ -1,7 +1,6 @@
 """Dashboard page: KPI cards + recent bills."""
 import qtawesome as qta
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGridLayout, QFrame,
     QTableWidget, QTableWidgetItem, QHeaderView,
@@ -14,6 +13,39 @@ from app.ui.widgets.digital_clock import DigitalClockWidget
 from app.ui.widgets.wavy_background import WavyGradientBackground
 from app.ui.widgets.animations import fade_slide_in
 from app.ui.theme import apply_card_shadow, SUCCESS
+
+
+def _trend(today_val: float, yesterday_val: float) -> tuple[str, str]:
+    """Accurate day-over-day delta for a stat card - real math against
+    yesterday's actual total, not a decorative placeholder. Returns
+    (label text, direction) where direction is 'up'/'down'/'flat'."""
+    if yesterday_val <= 0:
+        return ("First sale today" if today_val > 0 else "", "flat")
+    pct = (today_val - yesterday_val) / yesterday_val * 100
+    if abs(pct) < 1:
+        return "No change vs yesterday", "flat"
+    arrow = "▲" if pct > 0 else "▼"
+    return f"{arrow} {abs(pct):.0f}% vs yesterday", ("up" if pct > 0 else "down")
+
+
+def _amount_pill(text: str) -> QWidget:
+    """Grand Total cell rendered as a tinted rounded pill - reuses the same
+    accent-tint-gradient language as StatCard's icon chips instead of a
+    plain bold-colored table cell."""
+    wrapper = QWidget()
+    wrap_layout = QHBoxLayout(wrapper)
+    wrap_layout.setContentsMargins(4, 4, 4, 4)
+    wrap_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    pill = QLabel(text)
+    pill.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    pill.setStyleSheet(
+        f"background: qlineargradient(x1:0, y1:0, x2:1, y2:1,"
+        f" stop:0 {SUCCESS}26, stop:1 {SUCCESS}14);"
+        f" color: {SUCCESS}; border-radius: 10px; padding: 4px 14px;"
+        f" font-weight: 700; border: none;"
+    )
+    wrap_layout.addWidget(pill)
+    return wrapper
 
 
 class DashboardPage(QWidget):
@@ -91,9 +123,11 @@ class DashboardPage(QWidget):
         self.table.setHorizontalHeaderLabels(["Bill No.", "Time", "Items", "Grand Total"])
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.table.verticalHeader().setVisible(False)
+        self.table.verticalHeader().setDefaultSectionSize(46)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
         self.table.setAlternatingRowColors(True)
+        self.table.setShowGrid(False)
         self.table.setMinimumHeight(260)
         recent_layout.addWidget(self.table)
 
@@ -132,24 +166,20 @@ class DashboardPage(QWidget):
         self.card_daily_bills.set_value(str(stats["daily_bills"]))
         self.card_total_revenue.set_value(f"{currency} {stats['total_revenue']:.0f}")
 
+        revenue_trend, revenue_dir = _trend(stats["daily_revenue"], stats["yesterday_revenue"])
+        bills_trend, bills_dir = _trend(stats["daily_bills"], stats["yesterday_bills"])
+        self.card_daily_revenue.set_trend(revenue_trend, revenue_dir)
+        self.card_daily_bills.set_trend(bills_trend, bills_dir)
+
         from datetime import date
         bills = self.db.get_bills_by_date(date.today())
         self.table.setRowCount(0)
         for row_idx, bill in enumerate(bills):
             self.table.insertRow(row_idx)
             time_str = bill["created_at"].split("T")[1] if "T" in bill["created_at"] else bill["created_at"]
-            values = [
-                bill["bill_no"],
-                time_str,
-                str(bill["items_count"]),
-                f"{currency} {bill['grand_total']:.0f}",
-            ]
+            values = [bill["bill_no"], time_str, str(bill["items_count"])]
             for col, val in enumerate(values):
                 item = QTableWidgetItem(val)
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-                if col == 3:
-                    item.setForeground(QColor(SUCCESS))
-                    font = item.font()
-                    font.setBold(True)
-                    item.setFont(font)
                 self.table.setItem(row_idx, col, item)
+            self.table.setCellWidget(row_idx, 3, _amount_pill(f"{currency} {bill['grand_total']:.0f}"))
