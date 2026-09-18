@@ -30,6 +30,7 @@ from app.core.database import Database
 from app.core.pdf_utils import (
     export_receipt_to_pdf, print_receipt as print_receipt_thermal,
     render_html_to_pixmap, _new_document, _printable_width_points,
+    _estimate_content_height_mm, _configure_thermal_page,
 )
 from app.ui.widgets.message_box import AppMessageBox
 from app.ui.theme import apply_card_shadow
@@ -125,25 +126,23 @@ class ReceiptDialog(QDialog):
             )
 
     def print_via_dialog(self):
-        from PySide6.QtCore import QMarginsF
-        from PySide6.QtGui import QPageLayout
         from PySide6.QtPrintSupport import QPrintDialog, QPrinter
         printer = QPrinter(QPrinter.PrinterMode.HighResolution)
-        # setFullPage(True) makes Qt measure from the true physical paper
-        # edge instead of whatever default printable-area inset the
-        # printer driver itself bakes in - paired with a literal 0 top
-        # margin, this is what makes the receipt start printing right at
-        # the top of the page on a normal printer too.
-        printer.setFullPage(True)
-        printer.setPageMargins(QMarginsF(6, 0, 6, 6), QPageLayout.Unit.Millimeter)
         dialog = QPrintDialog(printer, self)
         if dialog.exec() == QDialog.DialogCode.Accepted:
+            # Page geometry is applied AFTER the dialog is accepted, not
+            # before - picking a printer in the dialog can reset properties
+            # set on the QPrinter beforehand, the same way switching output
+            # format does (see pdf_utils._configure_thermal_page's own
+            # docstring). Using the same tight custom-height sizing as the
+            # direct thermal-print path (rather than leaving whatever page
+            # size the chosen printer defaults to) is what stops a long
+            # stretch of blank paper being fed after the receipt content -
+            # a printer's own default page length is usually far taller
+            # than a single receipt.
+            height_mm = _estimate_content_height_mm(self.html, self.width_mm)
+            _configure_thermal_page(printer, self.width_mm, height_mm)
             document = _new_document(self.html)
-            # Keep the receipt's own narrow thermal width here too, rather
-            # than stretching it across the full page - so choosing a
-            # normal A4/Letter printer through this dialog still prints a
-            # proper narrow thermal-style receipt instead of one blown up
-            # across the whole sheet.
             document.setTextWidth(_printable_width_points(self.width_mm))
             document.print_(printer)
 

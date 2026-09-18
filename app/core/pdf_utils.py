@@ -109,10 +109,18 @@ def _configure_thermal_page(printer: QPrinter, width_mm: float, height_mm: float
     output format swaps QPrinter's underlying print engine, which silently
     resets page geometry set on the previous engine, so a margin/fullPage
     call made before that switch would otherwise just vanish."""
-    # A generous safety buffer against font-metric rounding between the
-    # estimate pass and the final print pass - a slightly tall receipt with
-    # trailing white space beats one that clips content onto another page.
-    page_height = max(height_mm * 1.5 + 25, 40)
+    # A small, flat safety pad against font-metric rounding between the
+    # estimate pass and the final print pass - just enough to avoid
+    # clipping the last line onto a second page, without the excess this
+    # used to have. The previous 50%+25mm buffer was the actual cause of
+    # thermal receipts feeding a long stretch of blank paper after the
+    # printed content: on a real roll printer, "extra height on the page"
+    # means "extra paper fed and wasted", not harmless margin the way it
+    # would be on a fixed A4 sheet. Measured against a real 16-item receipt,
+    # the old formula wasted ~168mm of blank paper per receipt; this pads
+    # by a flat 15mm instead - proportionally small on a long receipt,
+    # still a real cushion on a short one.
+    page_height = max(height_mm + 15, 40)
     printer.setPageSize(QPageSize(QSizeF(width_mm, page_height), QPageSize.Unit.Millimeter))
     # setFullPage(True) makes Qt measure the page from the true physical
     # paper edge instead of whatever default printable-area inset the
