@@ -6,8 +6,6 @@ from PySide6.QtCore import Qt, QVariantAnimation, QEasingCurve
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QLabel, QGraphicsDropShadowEffect
 
-from app.ui.theme import theme_manager, SUCCESS, DANGER
-
 _NUMBER_RE = re.compile(r"[-+]?\d[\d,]*\.?\d*")
 
 
@@ -44,30 +42,12 @@ class StatCard(QFrame):
         self.value_label.setStyleSheet("font-size: 24px; font-weight: 700; border: none;")
         self.title_label = QLabel(title)
         self.title_label.setProperty("role", "subtitle")
-        self.trend_label = QLabel("")
-        self.trend_label.setStyleSheet("font-size: 11px; font-weight: 600; border: none;")
-        self.trend_label.hide()
         text_layout.addWidget(self.value_label)
         text_layout.addWidget(self.title_label)
-        text_layout.addWidget(self.trend_label)
 
         outer.addWidget(self.icon_frame)
         outer.addLayout(text_layout)
         outer.addStretch()
-
-    def set_trend(self, text: str, direction: str = "flat"):
-        """Small delta line under the title, e.g. "+12% vs yesterday" -
-        direction picks the color: 'up' (green), 'down' (red), otherwise a
-        neutral muted tone. Pass an empty/None text to hide it."""
-        if not text:
-            self.trend_label.hide()
-            return
-        color = {"up": SUCCESS, "down": DANGER}.get(direction, theme_manager.palette()["text_muted"])
-        self.trend_label.setStyleSheet(
-            f"font-size: 11px; font-weight: 600; border: none; color: {color};"
-        )
-        self.trend_label.setText(text)
-        self.trend_label.show()
 
     def enterEvent(self, event):
         super().enterEvent(event)

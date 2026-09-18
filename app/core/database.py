@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import sqlite3
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
 from typing import Optional
 
 from app.core import config
@@ -415,17 +415,11 @@ class Database:
     # ------------------------------------------------------------------ #
     def get_dashboard_stats(self) -> dict:
         today_str = date.today().isoformat()
-        yesterday_str = (date.today() - timedelta(days=1)).isoformat()
         total_items = self.count_items(active_only=True)
         daily_row = self.conn.execute(
             """SELECT COUNT(*) AS bill_count, COALESCE(SUM(grand_total), 0) AS revenue
                FROM bills WHERE substr(created_at, 1, 10) = ?""",
             (today_str,),
-        ).fetchone()
-        yesterday_row = self.conn.execute(
-            """SELECT COUNT(*) AS bill_count, COALESCE(SUM(grand_total), 0) AS revenue
-               FROM bills WHERE substr(created_at, 1, 10) = ?""",
-            (yesterday_str,),
         ).fetchone()
         total_row = self.conn.execute(
             "SELECT COALESCE(SUM(grand_total), 0) AS revenue FROM bills"
@@ -435,8 +429,6 @@ class Database:
             "daily_revenue": daily_row["revenue"],
             "daily_bills": daily_row["bill_count"],
             "total_revenue": total_row["revenue"],
-            "yesterday_revenue": yesterday_row["revenue"],
-            "yesterday_bills": yesterday_row["bill_count"],
         }
 
     def close(self):

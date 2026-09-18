@@ -15,19 +15,6 @@ from app.ui.widgets.animations import fade_slide_in
 from app.ui.theme import apply_card_shadow, SUCCESS
 
 
-def _trend(today_val: float, yesterday_val: float) -> tuple[str, str]:
-    """Accurate day-over-day delta for a stat card - real math against
-    yesterday's actual total, not a decorative placeholder. Returns
-    (label text, direction) where direction is 'up'/'down'/'flat'."""
-    if yesterday_val <= 0:
-        return ("First sale today" if today_val > 0 else "", "flat")
-    pct = (today_val - yesterday_val) / yesterday_val * 100
-    if abs(pct) < 1:
-        return "No change vs yesterday", "flat"
-    arrow = "▲" if pct > 0 else "▼"
-    return f"{arrow} {abs(pct):.0f}% vs yesterday", ("up" if pct > 0 else "down")
-
-
 def _amount_pill(text: str) -> QWidget:
     """Grand Total cell rendered as a tinted rounded pill - reuses the same
     accent-tint-gradient language as StatCard's icon chips instead of a
@@ -165,11 +152,6 @@ class DashboardPage(QWidget):
         self.card_daily_revenue.set_value(f"{currency} {stats['daily_revenue']:.0f}")
         self.card_daily_bills.set_value(str(stats["daily_bills"]))
         self.card_total_revenue.set_value(f"{currency} {stats['total_revenue']:.0f}")
-
-        revenue_trend, revenue_dir = _trend(stats["daily_revenue"], stats["yesterday_revenue"])
-        bills_trend, bills_dir = _trend(stats["daily_bills"], stats["yesterday_bills"])
-        self.card_daily_revenue.set_trend(revenue_trend, revenue_dir)
-        self.card_daily_bills.set_trend(bills_trend, bills_dir)
 
         from datetime import date
         bills = self.db.get_bills_by_date(date.today())
